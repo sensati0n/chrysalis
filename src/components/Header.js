@@ -14,6 +14,7 @@ class Header extends Component{
             <Navbar.Divider />
             <Link to='/'><Button className="bp3-minimal" icon="home" text="Home" /></Link>
             <Link to='/deployNewProcess'><Button className="bp3-minimal" icon="document" text="Files" /></Link>
+            <Link to='/web3'><Button className="bp3-minimal" icon="document" text="WEb3" /></Link>
         </Navbar.Group>
     </Navbar>
       );

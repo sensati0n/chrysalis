@@ -3,6 +3,11 @@
   "version": "0.0.1",
   "description": "",
   "main": "index.js",
+  "browser": {
+    "fs": false,
+    "os": false,
+    "path": false
+  },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "webpack-dev-server --mode development"
@@ -24,8 +29,10 @@
     "webpack-dev-server": "^3.1.8"
   },
   "dependencies": {
+    "@babel/plugin-transform-runtime": "^7.12.17",
     "@blueprintjs/core": "^3.39.0",
-    "enzian-yellow": "0.3.2",
+    "babel-plugin-transform-class-properties": "^6.24.1",
+    "enzian-yallow": "0.0.24",
     "react": "^16.5.2",
     "react-dom": "^16.5.2",
     "react-hot-loader": "^4.3.11",
