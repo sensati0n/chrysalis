@@ -13,8 +13,9 @@ class Header extends Component{
             <Navbar.Heading>BUTTERfly</Navbar.Heading>
             <Navbar.Divider />
             <Link to='/'><Button className="bp3-minimal" icon="home" text="Home" /></Link>
-            <Link to='/deployNewProcess'><Button className="bp3-minimal" icon="document" text="Files" /></Link>
-            <Link to='/web3'><Button className="bp3-minimal" icon="document" text="WEb3" /></Link>
+            <Link to='/deployNewProcess'><Button className="bp3-minimal" icon="new-object" text="Deploy Process" /></Link>
+            <Link to='/processes'><Button className="bp3-minimal" icon="exchange" text="All Processes" /></Link>
+            <Link to='/web3'><Button className="bp3-minimal" icon="info-sign" text="Info" /></Link>
         </Navbar.Group>
     </Navbar>
       );

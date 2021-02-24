@@ -7,13 +7,15 @@ import "./App.css";
 
 class App extends Component{
   render(){
-  console.log("HI", process.env.NODE_ENV);
 
     return(
       <div>
       <Header />
       <div className="App">
         <h1>Decentralized Process Execution</h1>
+
+ 
+
       </div>
       </div>
     );
