@@ -21,11 +21,24 @@ class Deploy extends Component{
       selectedFile: "Select a file...",
       enzianModel: undefined,
       network: 'main',
-      selectedAbi: undefined
+      selectedAbi: undefined,
+      storedAbiNames: [],
+      selectedStoredAbi: 'custom'
     }
     
     enzian = new EnzianYellow(window.ethereum);
 
+    componentDidMount() {
+      let abis = JSON.parse(localStorage.getItem('abis'));
+      if(!abis) {
+          abis = new Array();
+      }
+      this.setState({storedAbiNames: abis.map(abi => abi.key)})
+    }
+
+    selectedStoredAbiChanged = (event) => {
+      this.setState({ selectedStoredAbi: event.target.value });
+  };
 
     handleChange = (event) => {
       this.setState({ network: event.target.value });
@@ -54,7 +67,6 @@ class Deploy extends Component{
         e.preventDefault()
         const reader = new FileReader()
         reader.onload = async (e) => { 
-          console.log('am i da new abi?')
           const text = (e.target.result)
           console.log(JSON.parse(text));
           this.setState({selectedAbi: JSON.parse(text)})
@@ -66,9 +78,34 @@ class Deploy extends Component{
 
 
       deployModel = async () => {
-      let theresult = await this.enzian.deployEnzianModelWithAbi(this.state.enzianModel, this.state.selectedAbi);
-      console.log(theresult);
-    }
+        switch(this.state.network) {
+          case 'main':
+            console.log("Deploying to Main"); 
+          break;
+          case 'ropsten':
+            console.log("Deploying to Testnet"); 
+          break;
+          case 'private':
+            if(this.state.selectedStoredAbi === 'custom') {
+              console.log("Reading network from file"); 
+            }
+            else {
+              let abis = JSON.parse(localStorage.getItem("abis"));
+              this.setState({ selectedAbi: abis.filter(abi => abi.key === this.state.selectedStoredAbi)[0] });
+            }
+          break;
+        }
+
+        let theresult = await this.enzian.deployEnzianModelWithAbi(this.state.enzianModel, this.state.selectedAbi);
+
+        let contracts = JSON.parse(localStorage.getItem("contracts"));
+        if(!contracts) {
+          contracts = new Array();
+        }
+        contracts.push(theresult._address);
+        localStorage.setItem("contracts", JSON.stringify(contracts));
+
+      }
 
     render(){
       return(
@@ -125,11 +162,36 @@ class Deploy extends Component{
                                 Compilation in butterfly is not supportet yet, as solc has a dependency to fs which is not supportet in browser environment.
                               </p>
 
-                              <div  style={{margin: '10px'}}>
-                                <h5>Upload the Contract-ABI with the linked Decision Library</h5>
-                                <FileInput  text='Select an ABI...' onInputChange={this.readABI} />
-                              </div>
+                             
                               
+                              <div>
+                                <h5>Or use an existing Network Configuration</h5>
+
+                                <RadioGroup
+                                  onChange={this.selectedStoredAbiChanged}
+                                  selectedValue={this.state.selectedStoredAbi}
+                                >
+                                    {
+                                            this.state.storedAbiNames.map(abiName => {
+                                                return (<Radio key={abiName} value={abiName} label={abiName} />)
+                                            })
+                                    }
+                                    <Radio key="custom" value="custom" label="Custom" />
+                                </RadioGroup>
+
+                              </div>
+
+                              {
+                                this.state.selectedStoredAbi === 'custom' ?
+                                  <div     style={{margin: '10px'}}>
+                                  <h5>Upload the Contract-ABI with the linked Decision Library</h5>
+                                  <FileInput  text='Select an ABI...' onInputChange={this.readABI} />
+                                </div>
+                                : ''
+                              
+                              }
+
+
                              </div>
                             : ''
                           }

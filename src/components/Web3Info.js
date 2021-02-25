@@ -13,6 +13,10 @@ class Web3Info extends Component{
   
 
   componentDidMount() {
+
+    localStorage.setItem('a contract', 'name');
+
+
     let ethereum = window.ethereum;
     if (window.ethereum) {
       let connected;

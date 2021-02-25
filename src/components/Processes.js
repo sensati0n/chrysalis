@@ -22,13 +22,11 @@ class Processes extends Component{
 
 
     componentDidMount() {
-      this.setState({ storedContracts: [
-        '0x33A54Fd1B675750128FD5Cd00e8DC0280cCD33E6',
-        '0x22821e3AB454B2271A3AdC363c9E1b5aef6FC1Db',
-        '0x8fB9cEee0A589a81a692d1E590CE492f94401e36',
-        '0xf0E5e88Fac548cE0f2EA690548A4f9e61c0F012f',
-        '0xdA0eA61287bD3ED0048C284f0C46c3C49f70b0A4'
-      ]});
+      let contracts = JSON.parse(localStorage.getItem('contracts'));
+      if(!contracts) {
+        contracts = new Array();
+      }
+      this.setState({ storedContracts: contracts });
     }
 
     handleValueChange = (valueAsNumber, valueAsString) => {
