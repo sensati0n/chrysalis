@@ -12,7 +12,7 @@ import {
   Icon
 } from  "@blueprintjs/core";
 
-const EnzianYellow = require("enzian-yallow");
+const EnzianYellow = require("enzian-yellow");
 
 class Deploy extends Component{
 
@@ -21,7 +21,7 @@ class Deploy extends Component{
       selectedFile: "Select a file...",
       enzianModel: undefined,
       network: 'main',
-      selectedAbi: 'Select an ABI...'
+      selectedAbi: undefined
     }
     
     enzian = new EnzianYellow(window.ethereum);
@@ -54,8 +54,10 @@ class Deploy extends Component{
         e.preventDefault()
         const reader = new FileReader()
         reader.onload = async (e) => { 
+          console.log('am i da new abi?')
           const text = (e.target.result)
-          console.log(text);
+          console.log(JSON.parse(text));
+          this.setState({selectedAbi: JSON.parse(text)})
         };
         reader.readAsText(e.target.files[0]);
         this.setState({selectedFile: e.target.files[0].name});
@@ -64,7 +66,7 @@ class Deploy extends Component{
 
 
       deployModel = async () => {
-      let theresult = await this.enzian.deployEnzianModel(this.state.enzianModel);
+      let theresult = await this.enzian.deployEnzianModelWithAbi(this.state.enzianModel, this.state.selectedAbi);
       console.log(theresult);
     }
 
@@ -125,7 +127,7 @@ class Deploy extends Component{
 
                               <div  style={{margin: '10px'}}>
                                 <h5>Upload the Contract-ABI with the linked Decision Library</h5>
-                                <FileInput  text={this.state.selectedAbi} onInputChange={this.readABI} />
+                                <FileInput  text='Select an ABI...' onInputChange={this.readABI} />
                               </div>
                               
                              </div>
