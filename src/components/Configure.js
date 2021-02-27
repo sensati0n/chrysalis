@@ -90,8 +90,7 @@ class Configure extends Component {
                     </Card>
 
                     <Card interactive={true} style={{margin: '10px', maxWidth:'500px'}}>
-                            
-                            <h4> <Icon icon="trash" iconSize={32} />Delete an existing Configuration</h4>
+                        <h4> <Icon icon="trash" iconSize={32} />Delete an existing Configuration</h4>
 
                             <RadioGroup
                                 label="Available Configurations"

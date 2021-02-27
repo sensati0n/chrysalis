@@ -1,7 +1,8 @@
-import React, { Component} from "react";
+import React, { Component } from "react";
 import {hot} from "react-hot-loader";
 import ReactJson from 'react-json-view'
 import Header from './Header';
+import { Select } from "@blueprintjs/select";
 
 
 import {
@@ -9,7 +10,8 @@ import {
   FileInput,
   Radio,
   RadioGroup,
-  Icon
+  MenuItem,
+  ControlGroup
 } from  "@blueprintjs/core";
 
 const EnzianYellow = require("enzian-yellow");
@@ -23,7 +25,11 @@ class Deploy extends Component{
       network: 'main',
       selectedAbi: undefined,
       storedAbiNames: [],
-      selectedStoredAbi: 'custom'
+      selectedStoredAbi: 'custom',
+
+      storedConnections: [],
+      selectedConnection: "Select Connection...",
+      connectionSelected: false
     }
     
     enzian = new EnzianYellow(window.ethereum);
@@ -34,6 +40,19 @@ class Deploy extends Component{
           abis = new Array();
       }
       this.setState({storedAbiNames: abis.map(abi => abi.key)})
+
+      let web3Connections = JSON.parse(localStorage.getItem("web3Connections"));
+      if(!web3Connections) {
+        web3Connections = new Array();
+      }
+ 
+      if (window.ethereum) {
+        web3Connections.push("MetaMask");
+      }
+      
+      this.setState({ storedConnections: web3Connections });
+  
+
     }
 
     selectedStoredAbiChanged = (event) => {
@@ -106,6 +125,32 @@ class Deploy extends Component{
         localStorage.setItem("contracts", JSON.stringify(contracts));
 
       }
+
+      renderStoredConnections = (storedConnection, { handleClick, modifiers }) => {
+        if (!modifiers.matchesPredicate) {
+            return null;
+        }
+  
+        return (
+            <MenuItem
+                active={modifiers.active}
+                key={storedConnection}
+                onClick={handleClick}
+                text={storedConnection}
+            />
+        );
+    };
+
+    storedConnectionSelected = (e) => {
+      this.setState({
+        selectedConnection: e,
+        connectionSelected: true
+      });
+  
+    } 
+  
+
+
 
     render(){
       return(
@@ -197,13 +242,27 @@ class Deploy extends Component{
                           }
                            
                           </div>
-
-                            <Button
-                              intent="primary"
-                              rightIcon="send-to-graph"
-                              text="Deploy Model to Blockchain"
-                              onClick={this.deployModel}
-                            />
+                          <ControlGroup>
+                              <Select
+                                items={this.state.storedConnections}
+                                itemRenderer={this.renderStoredConnections}
+                                noResults={<MenuItem disabled={true} text="No results." />}
+                                onItemSelect={this.storedConnectionSelected}
+                              >
+                                {/* children become the popover target; render value here */}
+                                <Button text={this.state.selectedConnection} rightIcon="double-caret-vertical" />
+                              </Select>
+                              {
+                                this.state.connectionSelected ?
+                                <Button
+                                  intent="primary"
+                                  rightIcon="send-to-graph"
+                                  text="Deploy Model to Blockchain"
+                                  onClick={this.deployModel}
+                                /> : <span />
+                              }
+                              </ControlGroup>
+                             
                         </div>
                       </div>
 

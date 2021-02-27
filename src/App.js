@@ -5,7 +5,10 @@ import "regenerator-runtime/runtime";
 
 import "./App.css";
 
-class App extends Component{
+class App extends Component {
+
+
+
   render(){
 
     return(
@@ -13,7 +16,6 @@ class App extends Component{
       <Header />
       <div className="App">
         <h1>Decentralized Process Execution</h1>
-
  
 
       </div>
