@@ -3,6 +3,7 @@ import {hot} from "react-hot-loader";
 import ReactJson from 'react-json-view'
 import Header from './Header';
 import { Select } from "@blueprintjs/select";
+const Web3 = require("web3");
 
 
 import {
@@ -114,6 +115,14 @@ class Deploy extends Component{
             }
           break;
         }
+        console.log("deploying with ", this.state.selectedConnection)
+
+        switch(this.state.selectedConnection) {
+          case 'MetaMask': break;
+          default:
+            this.enzian = new EnzianYellow(new Web3(new Web3.providers.WebsocketProvider(this.state.selectedConnection)));
+            break;
+        }
 
         let theresult = await this.enzian.deployEnzianModelWithAbi(this.state.enzianModel, this.state.selectedAbi);
 
@@ -123,6 +132,9 @@ class Deploy extends Component{
         }
         contracts.push(theresult._address);
         localStorage.setItem("contracts", JSON.stringify(contracts));
+      
+      
+        console.log("finish");
 
       }
 

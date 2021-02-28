@@ -118,7 +118,7 @@ class Web3Info extends Component{
                             large="true"
                             round="true"
                           >
-                            Connected
+                            Available
                           </Tag>
                           : 
                           <div>
@@ -129,7 +129,7 @@ class Web3Info extends Component{
                               large="true"
                               round="true"
                             >
-                              Not Connected
+                              Not Available
                             </Tag>
                           </div>
                         }

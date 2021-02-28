@@ -3,8 +3,9 @@ import {hot} from "react-hot-loader";
 
 import Header from './Header';
 
-import { MenuItem, Button, NumericInput } from  "@blueprintjs/core";
+import { MenuItem, Button, NumericInput, ControlGroup } from  "@blueprintjs/core";
 import { Select } from "@blueprintjs/select";
+const Web3 = require("web3");
 
 const EnzianYellow = require("enzian-yellow");
 
@@ -16,8 +17,11 @@ class Processes extends Component{
     state = {
       selectedContract: "Select a contract...",
       storedContracts: [],
+      storedConnections: [],
       currentEventLog: "No Contract Selected...",
-      taskToBeExecuted: -1
+      taskToBeExecuted: -1,
+      selectedConnection: "Select Connection...",
+      connectionSelected: false
     }
 
 
@@ -27,6 +31,19 @@ class Processes extends Component{
         contracts = new Array();
       }
       this.setState({ storedContracts: contracts });
+
+
+      let web3Connections = JSON.parse(localStorage.getItem("web3Connections"));
+      if(!web3Connections) {
+        web3Connections = new Array();
+      }
+ 
+      if (window.ethereum) {
+        web3Connections.push("MetaMask");
+      }
+      
+      this.setState({ storedConnections: web3Connections });
+
     }
 
     handleValueChange = (valueAsNumber, valueAsString) => {
@@ -60,7 +77,39 @@ class Processes extends Component{
 
   } 
 
+  storedConnectionSelected = (e) => {
+    this.setState({
+      selectedConnection: e,
+      connectionSelected: true
+    });
+
+  } 
+  
+  renderStoredConnections = (storedConnection, { handleClick, modifiers }) => {
+    if (!modifiers.matchesPredicate) {
+        return null;
+    }
+
+    return (
+        <MenuItem
+            active={modifiers.active}
+            key={storedConnection}
+            onClick={handleClick}
+            text={storedConnection}
+        />
+    );
+};
+
+
   onExecuteClick = async () => {
+
+    switch(this.state.selectedConnection) {
+      case 'MetaMask': break;
+      default:
+        this.enzian = new EnzianYellow(new Web3(new Web3.providers.WebsocketProvider(this.state.selectedConnection)));
+        break;
+    }
+
     let theresult = await this.enzian.executeTaskByAddress(
       this.state.selectedContract,
       this.state.taskToBeExecuted
@@ -105,12 +154,23 @@ class Processes extends Component{
                           <h5>Task List:</h5>
                           <NumericInput onValueChange={this.handleValueChange} />
                           <br />
+                          <ControlGroup>
+                              <Select
+                                items={this.state.storedConnections}
+                                itemRenderer={this.renderStoredConnections}
+                                noResults={<MenuItem disabled={true} text="No results." />}
+                                onItemSelect={this.storedConnectionSelected}
+                              >
+                                {/* children become the popover target; render value here */}
+                                <Button text={this.state.selectedConnection} rightIcon="double-caret-vertical" />
+                              </Select>
                           <Button
                               intent="primary"
                               text='Execute'
                               rightIcon="flow-linear"
                               onClick={this.onExecuteClick}
                           />
+                          </ControlGroup>
 
                         </div>
                       </div>
