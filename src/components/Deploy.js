@@ -118,21 +118,48 @@ class Deploy extends Component{
         console.log("deploying with ", this.state.selectedConnection)
 
         switch(this.state.selectedConnection) {
-          case 'MetaMask': break;
+          case 'MetaMask':
+          
+            this.enzian = new EnzianYellow(window.ethereum);
+
+             // SELF SIGNED
+
+                let theresult = await this.enzian.deployEnzianModelWithAbi(this.state.enzianModel, this.state.selectedAbi);
+
+                let contracts = JSON.parse(localStorage.getItem("contracts"));
+                if(!contracts) {
+                  contracts = new Array();
+                }
+                contracts.push(theresult._address);
+                localStorage.setItem("contracts", JSON.stringify(contracts));
+            
+                //
+          
+          
+          
+          break;
           default:
-            this.enzian = new EnzianYellow(new Web3(new Web3.providers.WebsocketProvider(this.state.selectedConnection)));
+            this.enzian = new EnzianYellow(new Web3(new Web3.providers.HttpProvider(this.state.selectedConnection)));
+
+             // SELF SIGNED
+
+                console.log('pk', localStorage.getItem('privateKey'));
+                theresult = await this.enzian.deployEnzianModelWithAbiSelfSigned(this.state.enzianModel, this.state.selectedAbi, localStorage.getItem('privateKey'));
+
+                contracts = JSON.parse(localStorage.getItem("contracts"));
+                if(!contracts) {
+                  contracts = new Array();
+                }
+                contracts.push(theresult);
+                localStorage.setItem("contracts", JSON.stringify(contracts));
+            
+                //
+
+
             break;
         }
 
-        let theresult = await this.enzian.deployEnzianModelWithAbi(this.state.enzianModel, this.state.selectedAbi);
-
-        let contracts = JSON.parse(localStorage.getItem("contracts"));
-        if(!contracts) {
-          contracts = new Array();
-        }
-        contracts.push(theresult._address);
-        localStorage.setItem("contracts", JSON.stringify(contracts));
-      
+       
       
         console.log("finish");
 

@@ -6,6 +6,7 @@ import Configure from './components/Configure.js';
 import Deploy from './components/Deploy.js';
 import Processes from './components/Processes.js';
 import Web3Info from './components/Web3Info.js';
+import Accounts from './components/Accounts.js';
 import history from './history';
 
 render(
@@ -16,7 +17,7 @@ render(
             <Route exact path='/processes' component={Processes} />
             <Route exact path='/configure' component={Configure} />
             <Route exact path='/web3' component={Web3Info} />
-            <Route exact path='/' component={App} />
+            <Route exact path='/accounts' component={Accounts} />
         </Switch>
     </Router>,
     document.getElementById('root')

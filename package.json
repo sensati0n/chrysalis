@@ -10,7 +10,8 @@
   },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "webpack-dev-server --mode development"
+    "start": "webpack-dev-server --mode development",
+    "build": "webpack --mode production"
   },
   "author": "Christian Sturm",
   "license": "ISC",
@@ -33,7 +34,7 @@
     "@blueprintjs/core": "^3.39.0",
     "@blueprintjs/select": "^3.15.5",
     "babel-plugin-transform-class-properties": "^6.24.1",
-    "enzian-yellow": "0.1.9",
+    "enzian-yellow": "0.2.20",
     "react": "^16.5.2",
     "react-dom": "^16.5.2",
     "react-hot-loader": "^4.3.11",

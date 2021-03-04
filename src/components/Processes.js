@@ -104,17 +104,28 @@ class Processes extends Component{
   onExecuteClick = async () => {
 
     switch(this.state.selectedConnection) {
-      case 'MetaMask': break;
+      case 'MetaMask':
+      
+        this.enzian = new EnzianYellow(window.ethereum);
+        let theresult = await this.enzian.executeTaskByAddress(
+          this.state.selectedContract,
+          this.state.taskToBeExecuted
+        );
+        console.log(theresult);
+      
+      break;
       default:
-        this.enzian = new EnzianYellow(new Web3(new Web3.providers.WebsocketProvider(this.state.selectedConnection)));
+        this.enzian = new EnzianYellow(new Web3(new Web3.providers.HttpProvider(this.state.selectedConnection)));
+        theresult = await this.enzian.executeTaskBySelfSigned(
+          this.state.selectedContract,
+          this.state.taskToBeExecuted,
+          localStorage.getItem('privateKey')
+        );
+        console.log(theresult);
         break;
     }
 
-    let theresult = await this.enzian.executeTaskByAddress(
-      this.state.selectedContract,
-      this.state.taskToBeExecuted
-    );
-    console.log(theresult);
+  
   }
 
 
