@@ -44,14 +44,9 @@ enzian;
  
       if (window.ethereum) {
         web3Connections.push("MetaMask");
-        this.enzian = new EnzianYellow(window.ethereum);
-
       }
-      else {
-        this.enzian = new EnzianYellow(new Web3(new Web3.providers.HttpProvider(this.state.selectedConnection)));
 
-      }
-      
+
       this.setState({ storedConnections: web3Connections });
 
     }
@@ -79,6 +74,10 @@ enzian;
   contractAddressSelected = (e) => {
     this.setState({ selectedContract: e });
 
+    if(!this.enzian) {
+      this.enzian = new EnzianYellow(new Web3(new Web3.providers.HttpProvider(this.state.selectedConnection)));
+    }
+
       this.enzian.eventlogByAddress(e).then(r => {
         this.setState({ currentEventLog: r })
       });
@@ -105,7 +104,7 @@ enzian;
         theresult = await this.enzian.executeTaskBySelfSigned(
           this.state.selectedContract,
           this.state.taskToBeExecuted,
-          localStorage.getItem('privateKey')
+          localStorage.getItem('selectedPrivateKey')
         );
         console.log(theresult);
         break;
