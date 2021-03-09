@@ -3,7 +3,7 @@ import {hot} from "react-hot-loader";
 
 import Header from './Header';
 
-import { MenuItem, Button, NumericInput, ControlGroup } from  "@blueprintjs/core";
+import { MenuItem, Button, NumericInput, ControlGroup, InputGroup, Tag, Spinner} from  "@blueprintjs/core";
 import { Select } from "@blueprintjs/select";
 const Web3 = require("web3");
 
@@ -18,20 +18,25 @@ class Processes extends Component{
       selectedContract: "Select a contract...",
       storedContracts: [],
       storedConnections: [],
-      currentEventLog: "No Contract Selected...",
+      currentEventLog: [],
       taskToBeExecuted: -1,
       selectedConnection: "Select Connection...",
-      connectionSelected: false
+      connectionSelected: false,
+      newContractAddress: '',
+      waitForVerification: false
     }
 
-
-    componentDidMount() {
+    loadContracts = () => {
       let contracts = JSON.parse(localStorage.getItem('contracts'));
       if(!contracts) {
         contracts = new Array();
       }
       this.setState({ storedContracts: contracts });
+    }
 
+    componentDidMount() {
+     
+      this.loadContracts();
 
       let web3Connections = JSON.parse(localStorage.getItem("web3Connections"));
       if(!web3Connections) {
@@ -51,7 +56,7 @@ class Processes extends Component{
     };
 
     renderContractAddress = (storedContract, { handleClick, modifiers }) => {
-      if (!modifiers.matchesPredicate) {
+      if (modifiers && !modifiers.matchesPredicate) {
           return null;
       }
 
@@ -66,18 +71,19 @@ class Processes extends Component{
   };
 
 
-
   contractAddressSelected = (e) => {
     this.setState({ selectedContract: e });
 
-    this.enzian.eventlogByAddress(e).then(r => {
-      console.log(r);
-      this.setState({ currentEventLog: r })
-    });
+      this.enzian.eventlogByAddress(e).then(r => {
+        console.log(r);
+        this.setState({ currentEventLog: r })
+      });
 
   } 
 
   onExecuteClick = async () => {
+
+    this.setState({waitForVerification: true})
 
     switch(this.state.selectedConnection) {
       case 'MetaMask':
@@ -101,6 +107,12 @@ class Processes extends Component{
         break;
     }
 
+    this.setState({waitForVerification: false})
+    
+    this.enzian.eventlogByAddress(this.state.selectedContract).then(r => {
+      console.log(r);
+      this.setState({ currentEventLog: r })
+    });
   
   }
 
@@ -110,6 +122,22 @@ class Processes extends Component{
     })
   }
 
+  addNewContractAddress = () => {
+    let contracts = JSON.parse(localStorage.getItem("contracts"));
+    if(!contracts) {
+      contracts = new Array();
+    }
+    contracts.push(this.state.newContractAddress);
+    localStorage.setItem("contracts", JSON.stringify(contracts));
+    this.loadContracts();
+    this.setState({newContractAddress: ''});
+
+  }
+
+  updateNewContractAddress = (event) => {
+    this.setState({newContractAddress : event.target.value});
+  }
+
 
     render(){
       return(
@@ -117,12 +145,13 @@ class Processes extends Component{
               <Header setAndUpdateConnection={this.setAndUpdateConnection} />
               <div className="content">
                   <h1>Deployed Processes on the current Blockchain</h1>
-                  <div style={{display: 'flex'}}>
+                  <div >
 
-                      <div  style={{margin: '10px'}}>
+                      <div style={{margin: '10px', display: 'flex'}}>
+                        <div style={{margin: '10px'}}>
                         <h5>Select a deployed Contract</h5>
 
-                        <Select
+                        <Select 
                             items={this.state.storedContracts}
                             itemRenderer={this.renderContractAddress}
                             noResults={<MenuItem disabled={true} text="No results." />}
@@ -132,30 +161,60 @@ class Processes extends Component{
                             <Button text={this.state.selectedContract} rightIcon="double-caret-vertical" />
                         </Select>
 
-
-                      </div>
-
-                      <div >
+                        </div>
                         <div style={{margin: '10px'}}>
-                          <h5>Event Log:</h5>
-                          {this.state.currentEventLog}
+                        <h5>or Add a new Contract Address</h5>
+
+                        <ControlGroup>
+                          <InputGroup onChange={this.updateNewContractAddress} id="text-input" placeholder="Paste the Contract Address here..."  intent="primary" style={{width: '400px', fontFamily: 'Consolas,Monaco,Lucida Console,Liberation Mono,DejaVu Sans Mono,Bitstream Vera Sans Mono,Courier New, monospace'}} />
+                          <Button
+                                intent="primary"
+                                rightIcon="floppy-disk"
+                                onClick={this.addNewContractAddress}
+                            />
+                          </ControlGroup>
+
                         </div>
                       </div>
 
                       <div >
                         <div style={{margin: '10px'}}>
-                          <h5>Task List:</h5>
-                          <NumericInput onValueChange={this.handleValueChange} />
-                          <br />
+                          <h5>Event Log:</h5>
+                          {
+                              this.state.currentEventLog.map(task => {
+                                return (  <Tag style={{margin: '5px'}} minimal="true" intent="success" large="true" key={task} > {task}</Tag> )
+                            })
+                          }
+                        </div>
+                      </div>
+
+                      <div >
+                        <div style={{margin: '10px'}}>
+                        <h5>Execute Task</h5>
+                          
                           <ControlGroup>
-                           
+                           {
+                             this.state.waitForVerification ?
+                             <div>
+                               <Spinner size={Spinner.SIZE_SMALL}/>
+                             </div>
+                             : 
+                             <div>
+
+                               <NumericInput onValueChange={this.handleValueChange} />
+                          <br />
                           <Button
                               intent="primary"
                               text='Execute'
                               rightIcon="flow-linear"
                               onClick={this.onExecuteClick}
                           />
+                             </div>
+                            
+                           }
+                          
                           </ControlGroup>
+                         
 
                         </div>
                       </div>

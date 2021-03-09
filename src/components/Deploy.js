@@ -7,12 +7,16 @@ const Web3 = require("web3");
 
 
 import {
+  AnchorButton,
   Button,
   FileInput,
   Radio,
   RadioGroup,
-  MenuItem,
-  ControlGroup
+  Dialog,
+  Classes,
+  Intent,
+  ProgressBar
+
 } from  "@blueprintjs/core";
 
 const EnzianYellow = require("enzian-yellow");
@@ -24,12 +28,15 @@ class Deploy extends Component{
       selectedFile: "Select a file...",
       enzianModel: undefined,
       network: 'main',
-      selectedAbi: undefined,
+      selectedAbi: '',
       storedAbiNames: [],
       selectedStoredAbi: 'custom',
 
       storedConnections: [],
       selectedConnection: '',
+      isDialogOpen: false,
+      deploymentProgress: 1
+
     }
     
     enzian = new EnzianYellow(window.ethereum);
@@ -96,6 +103,8 @@ class Deploy extends Component{
 
 
       deployModel = async () => {
+
+        this.setState({isDialogOpen: true});
         switch(this.state.network) {
           case 'main':
             console.log("Deploying to Main"); 
@@ -109,7 +118,10 @@ class Deploy extends Component{
             }
             else {
               let abis = JSON.parse(localStorage.getItem("abis"));
-              this.setState({ selectedAbi: abis.filter(abi => abi.key === this.state.selectedStoredAbi)[0] });
+              let filtered = abis.filter(abi => abi.key === this.state.selectedStoredAbi)[0].abi
+              await this.setState({ selectedAbi: JSON.parse(filtered) });
+              console.log("STATE SET")
+
             }
           break;
         }
@@ -142,7 +154,10 @@ class Deploy extends Component{
              // SELF SIGNED
 
                 console.log('pk', localStorage.getItem('privateKey'));
-                theresult = await this.enzian.deployEnzianModelWithAbiSelfSigned(this.state.enzianModel, this.state.selectedAbi, localStorage.getItem('privateKey'));
+              console.log("selected Abi:", this.state.selectedAbi)
+
+                  theresult = await this.enzian.deployEnzianModelWithAbiSelfSigned(this.state.enzianModel, this.state.selectedAbi, localStorage.getItem('privateKey'));
+
 
                 contracts = JSON.parse(localStorage.getItem("contracts"));
                 if(!contracts) {
@@ -160,6 +175,7 @@ class Deploy extends Component{
        
       
         console.log("finish");
+        this.setState({isDialogOpen: false});
 
       }
 
@@ -265,16 +281,53 @@ class Deploy extends Component{
                                   rightIcon="send-to-graph"
                                   text="Deploy Model to Blockchain"
                                   onClick={this.deployModel}
-                                /> : <span />
+                                />  <span />
                              
                         </div>
                       </div>
 
                   </div>
+                 
               </div>
+
+
+              <Dialog
+                  isOpen={this.state.isDialogOpen}
+                    icon="info-sign"
+                    title="Your Process Contract is being deployed..."
+                    onClose={() => {this.setState({isDialogOpen: false})}}
+                >
+                    <div className={Classes.DIALOG_BODY}>
+                        <p>
+                            <strong>
+                                The Contract is now being deployed.
+                                Afterwards, the Tasks are pured into the new Contract.
+                            </strong>
+                        </p>
+                        <p>
+                                For each Task, a new Transaction is created, signed and must be verified.
+                                This will take some time (aprox. 15 seconds per task, based on the Blockchain Confirugration).
+                        </p>
+                        <p>
+                            <strong>
+                                Press F12 to open the Browser Console to get more Information in the progress...
+                            </strong>
+                        </p>
+                        <ProgressBar intent={Intent.PRIMARY} value={this.state.deploymentProgress} />
+                       
+                 
+                    </div>
+                  
+                </Dialog>
+
+
+              
           </div>
       );
     }
   }
   
   export default hot(module)(Deploy);
+
+
+  
