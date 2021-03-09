@@ -117,7 +117,8 @@ class Processes extends Component{
 
   setAndUpdateConnection = (value) => {
     this.setState({
-      selectedConnection: value
+      selectedConnection: value.selectedConnection,
+      selectedStoredAccount: value.selectedStoredAccount
     })
   }
 
