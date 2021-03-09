@@ -6,9 +6,9 @@ const Web3 = require("web3");
 
 import { 
   Button,
-  MenuItem,
+  RadioGroup,
   ControlGroup,
-  Elevation,
+  Radio,
   Icon,
   InputGroup,
   Tag
@@ -24,6 +24,9 @@ class Accounts extends Component {
     storedConnections: [],
     selectedConnection: '',
     connectionSelected: false,
+
+    selectedStoredAccount: '',
+    storedAccounts: []
   };
 
 
@@ -31,6 +34,7 @@ class Accounts extends Component {
 
   componentDidMount() {
 
+    // GET CONNECTIONS FROM LOCAL STORAGE
     let web3Connections = JSON.parse(localStorage.getItem("web3Connections"));
     if(!web3Connections) {
       web3Connections = new Array();
@@ -41,12 +45,20 @@ class Accounts extends Component {
     }
     
     this.setState({ storedConnections: web3Connections });
+
+    // GET ACCOUNTS FROM LOCAL STORAGE
+    let accounts = JSON.parse(localStorage.getItem("accounts"));
+    if(!accounts) {
+      accounts = new Array();
+    }
+    this.setState({ storedAccounts: accounts });
     
   }
 
   setAndUpdateConnection = (value) => {
     this.setState({
-      selectedConnection: value
+      selectedConnection: value.selectedConnection,
+      selectedStoredAccount: value.selectedStoredAccount
     })
   }
 
@@ -62,21 +74,32 @@ class Accounts extends Component {
         let web3Instance = new Web3(new Web3.providers.HttpProvider(this.state.selectedConnection));
         let newAccount = await web3Instance.eth.accounts.create();
         console.log('newAccount', newAccount);
-        localStorage.setItem('privateKey', newAccount.privateKey);
-        localStorage.setItem('address', newAccount.address);
+        // localStorage.setItem('privateKey', newAccount.privateKey);
+        // localStorage.setItem('address', newAccount.address);
+
+        let accounts = JSON.parse(localStorage.getItem("accounts"));
+        if(!accounts) {
+          accounts = new Array();
+        }
+        accounts.push({priv: newAccount.privateKey, addr: newAccount.address});
+        localStorage.setItem("accounts", JSON.stringify(accounts));
+
+
         break;
     }
 
 
-    let contracts = JSON.parse(localStorage.getItem("contracts"));
-    if(!contracts) {
-      contracts = new Array();
-    }
-    contracts.push(theresult._address);
-    localStorage.setItem("contracts", JSON.stringify(contracts));
+  
 
   }
 
+  importAccount = () => {
+
+  }
+
+  selectedStoredAccountChanged = (event) => {
+    this.setState({ selectedStoredAccount: event.target.value });
+  }
 
 
     render(){
@@ -90,13 +113,12 @@ class Accounts extends Component {
                   <p>This generates a new Keypair. However, please consider, that the new Account do not have any funds on any network.</p>
                   <ControlGroup>
                             {
-                                this.state.connectionSelected ?
                                 <Button
                                   intent="primary"
                                   rightIcon="send-to-graph"
                                   text="Create new Account"
                                   onClick={this.createAccount}
-                                /> : <span />
+                                /> 
                               }
                               </ControlGroup>
 
@@ -105,15 +127,28 @@ class Accounts extends Component {
                   <ControlGroup>
                           <InputGroup onChange={this.updateInput} id="text-input" placeholder="Paste your private key here..."  intent="primary" style={{width: '800px', fontFamily: 'Consolas,Monaco,Lucida Console,Liberation Mono,DejaVu Sans Mono,Bitstream Vera Sans Mono,Courier New, monospace'}} />
                               {
-                                this.state.connectionSelected ?
                                 <Button
                                   intent="primary"
-                                  rightIcon="send-to-graph"
-                                  text="Create new Account"
-                                  onClick={this.createAccount}
-                                /> : <span />
+                                  rightIcon="import"
+                                  text="Import Account"
+                                  onClick={this.importAccount}
+                                /> 
                               }
                               </ControlGroup>
+
+
+                  <h3>Accounts</h3>
+                  <RadioGroup
+                                label="Available Accounts"
+                                onChange={this.selectedStoredAccountChanged}
+                                selectedValue={this.state.selectedStoredAccount}
+                            >
+                                {
+                                   this.state.storedAccounts.map(account => {
+                                            return (<Radio key={account.addr} value={account.addr} label={account.addr} />)
+                                        })
+                                }
+                            </RadioGroup>
               </div>
           </div>
       );

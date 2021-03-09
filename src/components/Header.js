@@ -11,12 +11,17 @@ class Header extends Component{
   state = {
     storedConnections: [],
     selectedConnection: '',
-    connected: false
+    connected: false,
+
+    selectedAddress: '',
+    selectedPrivateKey: '',
+    storedAccounts: []
   }
 
 
-  componentDidMount() {
+  componentDidMount = async () =>  {
 
+    // GET CONNECTIONS FROM LOCAL STORAGE
     let web3Connections = JSON.parse(localStorage.getItem("web3Connections"));
     if(!web3Connections) {
       web3Connections = new Array();
@@ -28,23 +33,69 @@ class Header extends Component{
     
     this.setState({ storedConnections: web3Connections });
 
+    // GET SELECTED CONNECTION FROM LOCAL STORAGE
     let selectedConnectionFromStorage = localStorage.getItem("selectedConnection");
-    this.setState({ selectedConnection: selectedConnectionFromStorage });
-
-    var handler = this.props.setAndUpdateConnection;
-    handler(selectedConnectionFromStorage);
+    await this.setState({ selectedConnection: selectedConnectionFromStorage });
+    // AND TRY TO CONNECT
     this.tryConnect(selectedConnectionFromStorage)
 
+    // GET ACCOUNTS FROM LOCAL STORAGE
+    let accounts = JSON.parse(localStorage.getItem("accounts"));
+    if(!accounts) {
+      accounts = new Array();
+    }
+    this.setState({ storedAccounts: accounts });
+
+    // GET SELECTED ACCOUNT FROM LOCAL STORAGE
+    await this.setState({ selectedAddress: localStorage.getItem("selectedAddress") });
+
+    var handler = this.props.setAndUpdateConnection;
+    handler({
+      selectedConnection: this.state.selectedConnection,
+      selectedStoredAccount: this.state.selectedAddress
+    }
+
+    );
 
   }
 
+  renderStoredAccounts = (storedAccount, { handleClick, modifiers }) => {
+    if (!modifiers.matchesPredicate) {
+        return null;
+    }
+
+    return (
+        <MenuItem
+            active={modifiers.active}
+            key={storedAccount.addr}
+            onClick={handleClick}
+            text={storedAccount.addr}
+        />
+    );
+    };
+
+    storedAccountSelected = async (e) =>  {
+      this.setState({
+        selectedAddress: e.addr,
+        selectedPrivateKey: e.priv
+      });
+
+      localStorage.setItem("selectedAddress", e.addr)
+      localStorage.setItem("selectedPrivateKey", e.priv)
+
+      var handler = this.props.setAndUpdateConnection;
+      handler({
+        selectedConnection: this.state.selectedConnection,
+        selectedStoredAccount: this.state.selectedStoredAccount
+      })
+
+    } 
 
   
   renderStoredConnections = (storedConnection, { handleClick, modifiers }) => {
     if (!modifiers.matchesPredicate) {
         return null;
     }
-
     return (
         <MenuItem
             active={modifiers.active}
@@ -64,7 +115,10 @@ class Header extends Component{
       localStorage.setItem("selectedConnection", e)
 
       var handler = this.props.setAndUpdateConnection;
-      handler(e);
+      handler({
+        selectedConnection: e,
+        selectedStoredAccount: this.state.selectedStoredAccount
+      });
       this.tryConnect(e);
     } 
 
@@ -110,7 +164,25 @@ class Header extends Component{
            
         </Navbar.Group>
         <Navbar.Group align={Alignment.RIGHT}>
-              <ControlGroup>
+
+        <ControlGroup >
+
+                <Tag icon="user"  large="true"  > </Tag>
+                <Select
+                  items={this.state.storedAccounts}
+                  itemRenderer={this.renderStoredAccounts}
+                  noResults={<MenuItem disabled={true} text="No results." />}
+                  onItemSelect={this.storedAccountSelected}
+                >
+                  {/* children become the popover target; render value here */}
+                  <Button text={this.state.selectedAddress} rightIcon="double-caret-vertical" />
+                </Select>
+                </ControlGroup>
+              
+
+
+
+              <ControlGroup style={{marginLeft: '20px'}}>
                 {
                   this.state.connected ?
                     <Tag icon="feed" intent="success" large="true"  > </Tag> :

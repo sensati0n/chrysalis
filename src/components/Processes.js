@@ -75,7 +75,6 @@ class Processes extends Component{
     this.setState({ selectedContract: e });
 
       this.enzian.eventlogByAddress(e).then(r => {
-        console.log(r);
         this.setState({ currentEventLog: r })
       });
 

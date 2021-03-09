@@ -179,12 +179,13 @@ class Deploy extends Component{
 
       }
 
-
-    setAndUpdateConnection = (value) => {
-      this.setState({
-        selectedConnection: value
-      })
-    }
+      setAndUpdateConnection = (value) => {
+        this.setState({
+          selectedConnection: value.selectedConnection,
+          selectedAddress: value.selectedAddress
+        })
+      }
+    
 
     render(){
       return(
