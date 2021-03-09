@@ -7,13 +7,18 @@ import "./App.css";
 
 class App extends Component {
 
+  setAndUpdateConnection = (value) => {
+    this.setState({
+      handlerValue: value
+    })
+  }
 
 
   render(){
 
     return(
       <div>
-      <Header />
+      <Header setAndUpdateConnection={this.setAndUpdateConnection} />
       <div className="App">
         <h1>Decentralized Process Execution</h1>
  

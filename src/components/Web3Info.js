@@ -100,7 +100,7 @@ class Web3Info extends Component{
     render(){
       return(
           <div>
-              <Header />
+              <Header   setAndUpdateConnection={() => {}} />
               <div className="content">
                   <h1>Blockchain Connection Management</h1>
                   

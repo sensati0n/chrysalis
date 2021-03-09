@@ -23,7 +23,7 @@ class Accounts extends Component {
   state = {
     storedConnections: [],
     selectedConnection: '',
-    connectionSelected: false
+    connectionSelected: false,
   };
 
 
@@ -42,6 +42,12 @@ class Accounts extends Component {
     
     this.setState({ storedConnections: web3Connections });
     
+  }
+
+  setAndUpdateConnection = (value) => {
+    this.setState({
+      selectedConnection: value
+    })
   }
 
   createAccount = async () => {
@@ -72,47 +78,32 @@ class Accounts extends Component {
   }
 
 
-  renderStoredConnections = (storedConnection, { handleClick, modifiers }) => {
-    if (!modifiers.matchesPredicate) {
-        return null;
-    }
-
-    return (
-        <MenuItem
-            active={modifiers.active}
-            key={storedConnection}
-            onClick={handleClick}
-            text={storedConnection}
-        />
-    );
-    };
-
-    storedConnectionSelected = (e) => {
-    this.setState({
-        selectedConnection: e,
-        connectionSelected: true
-    });
-
-    } 
-
-
 
     render(){
       return(
           <div>
-              <Header />
+              <Header setAndUpdateConnection={this.setAndUpdateConnection} />
               <div className="content">
+                <h1>{this.state.handlerValue}</h1>
                   <h1>Account Management</h1>
+                  <h3>Create a new Account</h3>
+                  <p>This generates a new Keypair. However, please consider, that the new Account do not have any funds on any network.</p>
                   <ControlGroup>
-                              <Select
-                                items={this.state.storedConnections}
-                                itemRenderer={this.renderStoredConnections}
-                                noResults={<MenuItem disabled={true} text="No results." />}
-                                onItemSelect={this.storedConnectionSelected}
-                              >
-                                {/* children become the popover target; render value here */}
-                                <Button text={this.state.selectedConnection} rightIcon="double-caret-vertical" />
-                              </Select>
+                            {
+                                this.state.connectionSelected ?
+                                <Button
+                                  intent="primary"
+                                  rightIcon="send-to-graph"
+                                  text="Create new Account"
+                                  onClick={this.createAccount}
+                                /> : <span />
+                              }
+                              </ControlGroup>
+
+                  <h3>Import an Account</h3>
+                  <p>This generates a new Keypair. However, please consider, that the new Account do not have any funds on any network.</p>
+                  <ControlGroup>
+                          <InputGroup onChange={this.updateInput} id="text-input" placeholder="Paste your private key here..."  intent="primary" style={{width: '800px', fontFamily: 'Consolas,Monaco,Lucida Console,Liberation Mono,DejaVu Sans Mono,Bitstream Vera Sans Mono,Courier New, monospace'}} />
                               {
                                 this.state.connectionSelected ?
                                 <Button
@@ -123,7 +114,6 @@ class Accounts extends Component {
                                 /> : <span />
                               }
                               </ControlGroup>
-                 
               </div>
           </div>
       );

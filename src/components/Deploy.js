@@ -29,8 +29,7 @@ class Deploy extends Component{
       selectedStoredAbi: 'custom',
 
       storedConnections: [],
-      selectedConnection: "Select Connection...",
-      connectionSelected: false
+      selectedConnection: '',
     }
     
     enzian = new EnzianYellow(window.ethereum);
@@ -53,7 +52,6 @@ class Deploy extends Component{
       
       this.setState({ storedConnections: web3Connections });
   
-
     }
 
     selectedStoredAbiChanged = (event) => {
@@ -165,36 +163,17 @@ class Deploy extends Component{
 
       }
 
-      renderStoredConnections = (storedConnection, { handleClick, modifiers }) => {
-        if (!modifiers.matchesPredicate) {
-            return null;
-        }
-  
-        return (
-            <MenuItem
-                active={modifiers.active}
-                key={storedConnection}
-                onClick={handleClick}
-                text={storedConnection}
-            />
-        );
-    };
 
-    storedConnectionSelected = (e) => {
+    setAndUpdateConnection = (value) => {
       this.setState({
-        selectedConnection: e,
-        connectionSelected: true
-      });
-  
-    } 
-  
-
-
+        selectedConnection: value
+      })
+    }
 
     render(){
       return(
           <div>
-              <Header />
+              <Header setAndUpdateConnection={this.setAndUpdateConnection} />
               <div className="content">
                   <h1>Deploy</h1>
                   <div style={{display: 'flex'}}>
@@ -281,26 +260,12 @@ class Deploy extends Component{
                           }
                            
                           </div>
-                          <ControlGroup>
-                              <Select
-                                items={this.state.storedConnections}
-                                itemRenderer={this.renderStoredConnections}
-                                noResults={<MenuItem disabled={true} text="No results." />}
-                                onItemSelect={this.storedConnectionSelected}
-                              >
-                                {/* children become the popover target; render value here */}
-                                <Button text={this.state.selectedConnection} rightIcon="double-caret-vertical" />
-                              </Select>
-                              {
-                                this.state.connectionSelected ?
                                 <Button
                                   intent="primary"
                                   rightIcon="send-to-graph"
                                   text="Deploy Model to Blockchain"
                                   onClick={this.deployModel}
                                 /> : <span />
-                              }
-                              </ControlGroup>
                              
                         </div>
                       </div>

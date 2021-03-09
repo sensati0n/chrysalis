@@ -69,7 +69,7 @@ class Configure extends Component {
     render(){
       return(
         <div>
-            <Header />
+            <Header  setAndUpdateConnection={() => {}} />
                 <div className="content">
                     <h3>Private Net Configuration</h3>
 

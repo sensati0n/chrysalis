@@ -77,30 +77,6 @@ class Processes extends Component{
 
   } 
 
-  storedConnectionSelected = (e) => {
-    this.setState({
-      selectedConnection: e,
-      connectionSelected: true
-    });
-
-  } 
-  
-  renderStoredConnections = (storedConnection, { handleClick, modifiers }) => {
-    if (!modifiers.matchesPredicate) {
-        return null;
-    }
-
-    return (
-        <MenuItem
-            active={modifiers.active}
-            key={storedConnection}
-            onClick={handleClick}
-            text={storedConnection}
-        />
-    );
-};
-
-
   onExecuteClick = async () => {
 
     switch(this.state.selectedConnection) {
@@ -128,11 +104,17 @@ class Processes extends Component{
   
   }
 
+  setAndUpdateConnection = (value) => {
+    this.setState({
+      selectedConnection: value
+    })
+  }
+
 
     render(){
       return(
           <div>
-              <Header />
+              <Header setAndUpdateConnection={this.setAndUpdateConnection} />
               <div className="content">
                   <h1>Deployed Processes on the current Blockchain</h1>
                   <div style={{display: 'flex'}}>
@@ -166,15 +148,7 @@ class Processes extends Component{
                           <NumericInput onValueChange={this.handleValueChange} />
                           <br />
                           <ControlGroup>
-                              <Select
-                                items={this.state.storedConnections}
-                                itemRenderer={this.renderStoredConnections}
-                                noResults={<MenuItem disabled={true} text="No results." />}
-                                onItemSelect={this.storedConnectionSelected}
-                              >
-                                {/* children become the popover target; render value here */}
-                                <Button text={this.state.selectedConnection} rightIcon="double-caret-vertical" />
-                              </Select>
+                           
                           <Button
                               intent="primary"
                               text='Execute'
