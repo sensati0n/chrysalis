@@ -11,8 +11,7 @@ const EnzianYellow = require("enzian-yellow");
 
 class Processes extends Component{
 
-  enzian = new EnzianYellow(window.ethereum);
-
+enzian;
 
     state = {
       selectedContract: "Select a contract...",
@@ -45,6 +44,12 @@ class Processes extends Component{
  
       if (window.ethereum) {
         web3Connections.push("MetaMask");
+        this.enzian = new EnzianYellow(window.ethereum);
+
+      }
+      else {
+        this.enzian = new EnzianYellow(new Web3(new Web3.providers.HttpProvider(this.state.selectedConnection)));
+
       }
       
       this.setState({ storedConnections: web3Connections });
