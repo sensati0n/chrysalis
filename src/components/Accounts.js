@@ -26,7 +26,9 @@ class Accounts extends Component {
     connectionSelected: false,
 
     selectedStoredAccount: '',
-    storedAccounts: []
+    storedAccounts: [],
+
+    currentImportAccount: ''
   };
 
 
@@ -93,7 +95,22 @@ class Accounts extends Component {
 
   }
 
+
+  updateInputImportAccount = (event) => {
+    this.setState({currentImportAccount : event.target.value});
+  }
+
   importAccount = () => {
+    let web3Instance = new Web3(new Web3.providers.HttpProvider(this.state.selectedConnection));
+
+    let importedAccount = web3Instance.eth.accounts.privateKeyToAccount(this.state.currentImportAccount);
+
+    let accounts = JSON.parse(localStorage.getItem("accounts"));
+    if(!accounts) {
+      accounts = new Array();
+    }
+    accounts.push({priv: this.state.currentImportAccount, addr: importedAccount.address});
+    localStorage.setItem("accounts", JSON.stringify(accounts));
 
   }
 
@@ -125,7 +142,7 @@ class Accounts extends Component {
                   <h3>Import an Account</h3>
                   <p>This generates a new Keypair. However, please consider, that the new Account do not have any funds on any network.</p>
                   <ControlGroup>
-                          <InputGroup onChange={this.updateInput} id="text-input" placeholder="Paste your private key here..."  intent="primary" style={{width: '800px', fontFamily: 'Consolas,Monaco,Lucida Console,Liberation Mono,DejaVu Sans Mono,Bitstream Vera Sans Mono,Courier New, monospace'}} />
+                          <InputGroup onChange={this.updateInputImportAccount} id="text-input" placeholder="Paste your private key here..."  intent="primary" style={{width: '800px', fontFamily: 'Consolas,Monaco,Lucida Console,Liberation Mono,DejaVu Sans Mono,Bitstream Vera Sans Mono,Courier New, monospace'}} />
                               {
                                 <Button
                                   intent="primary"
