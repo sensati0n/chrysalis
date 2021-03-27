@@ -75,7 +75,14 @@ enzian;
     this.setState({ selectedContract: e });
 
     if(!this.enzian) {
-      this.enzian = new EnzianYellow(new Web3(new Web3.providers.HttpProvider(this.state.selectedConnection)));
+      if(this.state.selectedConnection === 'MetaMask') {
+
+        this.enzian = new EnzianYellow(window.ethereum);
+      }
+      else {
+        this.enzian = new EnzianYellow(new Web3(new Web3.providers.HttpProvider(this.state.selectedConnection)));
+
+      }
     }
 
       this.enzian.eventlogByAddress(e).then(r => {

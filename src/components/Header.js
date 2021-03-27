@@ -123,9 +123,17 @@ class Header extends Component{
     } 
 
     tryConnect = async (e) => {
-      let testConnection = new Web3(new Web3.providers.HttpProvider(e))
+      let testConnection;
+      if(this.state.selectedConnection === 'MetaMask') {
+        testConnection = window.ethereum;
+        console.log(testConnection)
+        this.setState({connected: 'true'});
+      }
+      else {
+        testConnection = new Web3(new Web3.providers.HttpProvider(e))
+        this.setState({connected: testConnection.currentProvider.connected});
 
-      this.setState({connected: testConnection.currentProvider.connected});
+      }
 
       try {
         let accounts = await testConnection.eth.getAccounts();
